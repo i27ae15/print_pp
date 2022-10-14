@@ -2,7 +2,8 @@ from print_pp.logging import PrintSettings, Print, BColors, check_caller_line
 import inspect
 
 
-
+s = PrintSettings()
+s._logs_color = BColors.OKBLUE
 
 x = 'hello world'
 y = 456
@@ -25,15 +26,9 @@ class ClassToTest:
     here = 'j'
     def __init__(self):
         self.z = 987
-        self.p = 987
-        # Print(self.z)
+        Print(self.z)
         
-        # callers_local_vars = inspect.currentframe().f_back.f_back.f_locals.items()
-        callers_local_vars = inspect.getmembers(self)
-        
-        
-        print(callers_local_vars)
-        
+
         
     def get_user_attributes(cls):
         boring = dir(type('dummy', (object,), {}))

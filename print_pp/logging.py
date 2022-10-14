@@ -62,7 +62,7 @@ class PrintSettings:
     _shared_state = {}
     
     _variable_color = BColors.OKGREEN
-    _logs_color = BColors.OKGREEN
+    _logs_color = BColors.OKBLUE
 
     def __new__(cls, *args, **kargs):
         inst = super().__new__(cls)
