@@ -61,8 +61,8 @@ class BColors:
 class PrintSettings:
     _shared_state = {}
     
-    variable_color = BColors.OKGREEN
-    logs_color = BColors.OKGREEN
+    _variable_color = BColors.OKGREEN
+    _logs_color = BColors.OKGREEN
 
     def __new__(cls, *args, **kargs):
         inst = super().__new__(cls)
@@ -91,14 +91,15 @@ class Print(PrintSettings):
             for _ in range(0, num_al):
                 print('-'*num_separators)
         
+        
         if type(text) is list or type(text) is tuple:
             for index, t in enumerate(text):
                 if var:
                     if type(var) is list or type(var) is tuple:
                         # print(f'{self.get_variable_name(t)}: {var[index]}')
-                        print(f'{self.variable_color}{t}{BColors.ENDC}: {var[index]}')
+                        print(f'{self._variable_color}{t}{BColors.ENDC}: {var[index]}')
                     else:
-                        print(f'{self.variable_color}{t}{BColors.ENDC}: {var}')
+                        print(f'{self._variable_color}{t}{BColors.ENDC}: {var}')
                 else:
                     if self.__check_variables:
                         
@@ -111,7 +112,7 @@ class Print(PrintSettings):
                         # we choose the first approach since is the most common to encounter
 
                         if (var_name := self.get_variable_name(t)):
-                            print(f'{self.variable_color}{var_name}{BColors.ENDC}: {t}')
+                            print(f'{self._variable_color}{var_name}{BColors.ENDC}: {t}')
                         else:
                             print(t)
                             self.__check_variables = False
@@ -120,9 +121,9 @@ class Print(PrintSettings):
         else:
             if var:
                 if text is None:
-                    print(f'{self.variable_color}{self.get_variable_name(var)}{BColors.ENDC}: {var}')
+                    print(f'{self._variable_color}{self.get_variable_name(var)}{BColors.ENDC}: {var}')
                 elif text is not None:
-                    print(f'{self.variable_color}{text}{BColors.ENDC}: {var}')
+                    print(f'{self._variable_color}{text}{BColors.ENDC}: {var}')
             else:
 
                 # even though we're calling for text, this text can be a variable, so ,
@@ -130,21 +131,21 @@ class Print(PrintSettings):
                 # to perform special treatment
 
                 if (var_name := self.get_variable_name(text)):
-                    print(f'{self.variable_color}{var_name}{BColors.ENDC}: {text}')
+                    print(f'{self._variable_color}{var_name}{BColors.ENDC}: {text}')
                 else:
                     print(text)
 
 
         if include_time:
-            print(f'{self.logs_color}runtime{BColors.ENDC}: {datetime.datetime.now().time()}')
+            print(f'{self._logs_color}runtime{BColors.ENDC}: {datetime.datetime.now().time()}')
             
         caller = inspect.getframeinfo(inspect.stack()[1][0])
         
         if include_caller_file:
-            print(f'{self.logs_color}file{BColors.ENDC}: {caller.filename}')
+            print(f'{self._logs_color}file{BColors.ENDC}: {caller.filename}')
         
         if include_caller_line:
-            print(f'{self.logs_color}line:{BColors.ENDC} {caller.lineno}')
+            print(f'{self._logs_color}line{BColors.ENDC}: {caller.lineno}')
             
         if bl:
             for _ in range(0, num_bl):
@@ -152,9 +153,19 @@ class Print(PrintSettings):
 
 
     def get_variable_name(self, var):
+            
         callers_local_vars = inspect.currentframe().f_back.f_back.f_locals.items()
-        var_name = [var_name for var_name, var_val in callers_local_vars if var_val is var]
-        return var_name[0] if var_name else None
+        var_name = [(var_name, var_val) for var_name, var_val in callers_local_vars]
+                
+        if var_name[0][0] == 'self':
+            cls = var_name[0][1]
+
+            boring = dir(type('dummy', (object,), {}))
+            items = [item for item in inspect.getmembers(cls) if item[0] not in boring]
+
+            var_name = list(filter(lambda pair: pair[1] == var, items))   
+            
+        return var_name[0][0] if var_name else None
     
     
 
