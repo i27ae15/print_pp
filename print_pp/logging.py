@@ -72,8 +72,8 @@ class PrintSettings:
 
 class Print(PrintSettings):
     
-    
     __check_variables = True
+    
 
     def __init__(self, text:str, var=None, num_separators=50, al=True, num_al=1, bl=True, num_bl=1, include_time=False, 
                 include_caller_file=False, include_caller_line=True) -> None:
