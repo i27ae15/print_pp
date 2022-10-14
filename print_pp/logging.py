@@ -71,9 +71,7 @@ class PrintSettings:
 
 
 class Print(PrintSettings):
-
-    # BUG:
-    # not printing with self.variable
+    
     
     __check_variables = True
 
